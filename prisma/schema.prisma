@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  userId       String   @id @default(uuid()) @map("user_id")
+  userName     String   @map("user_name")
+  userEmail    String   @unique @map("user_email")
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  assignedProjects Project[] @relation("ProjectAssignee")
+  createdProjects  Project[] @relation("ProjectCreator")
+  assignedTasks    Task[]    @relation("TaskAssignee")
+  createdTasks     Task[]    @relation("TaskCreator")
+  comments         Comment[]
+
+  @@map("users")
+}
+
+model Project {
+  projectId   String    @id @default(uuid()) @map("project_id")
+  projectName String    @map("project_name")
+  assigneeId  String    @map("assignee_id")
+  priorityId  String    @map("priority_id")
+  statusId    String    @map("status_id")
+  description String?
+  startDate   DateTime? @map("start_date")
+  deadline    DateTime?
+  completedAt DateTime? @map("completed_at")
+  createdBy   String    @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  assignee User      @relation("ProjectAssignee", fields: [assigneeId], references: [userId])
+  creator  User      @relation("ProjectCreator", fields: [createdBy], references: [userId])
+  priority Priority  @relation(fields: [priorityId], references: [priorityId])
+  status   Status    @relation(fields: [statusId], references: [statusId])
+  tasks    Task[]
+  comments Comment[]
+
+  @@map("projects")
+}
+
+model Task {
+  taskId      String    @id @default(uuid()) @map("task_id")
+  projectId   String    @map("project_id")
+  taskName    String    @map("task_name")
+  assigneeId  String    @map("assignee_id")
+  priorityId  String    @map("priority_id")
+  statusId    String    @map("status_id")
+  description String?
+  startDate   DateTime? @map("start_date")
+  deadline    DateTime?
+  completedAt DateTime? @map("completed_at")
+  createdBy   String    @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  project  Project   @relation(fields: [projectId], references: [projectId])
+  assignee User      @relation("TaskAssignee", fields: [assigneeId], references: [userId])
+  creator  User      @relation("TaskCreator", fields: [createdBy], references: [userId])
+  priority Priority  @relation(fields: [priorityId], references: [priorityId])
+  status   Status    @relation(fields: [statusId], references: [statusId])
+  comments Comment[]
+
+  @@map("tasks")
+}
+
+model Priority {
+  priorityId   String   @id @default(uuid()) @map("priority_id")
+  priorityName String   @map("priority_name")
+  sortOrder    Int      @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  projects Project[]
+  tasks    Task[]
+
+  @@map("priorities")
+}
+
+model Status {
+  statusId    String   @id @default(uuid()) @map("status_id")
+  statusName  String   @map("status_name")
+  sortOrder   Int      @map("sort_order")
+  isCompleted Boolean  @default(false) @map("is_completed")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  projects Project[]
+  tasks    Task[]
+
+  @@map("statuses")
+}
+
+model Comment {
+  commentId String   @id @default(uuid()) @map("comment_id")
+  userId    String   @map("user_id")
+  content   String
+  projectId String   @map("project_id")
+  taskId    String?  @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [userId])
+  project Project @relation(fields: [projectId], references: [projectId])
+  task    Task?   @relation(fields: [taskId], references: [taskId])
+
+  @@map("comments")
+}
