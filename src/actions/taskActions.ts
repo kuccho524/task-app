@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { cacheTag, revalidatePath } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export type CreateTaskState = {
@@ -21,6 +21,10 @@ export async function createTask(
   formData: FormData
 ): Promise<CreateTaskState> {
   const taskName = String(formData.get('taskName') ?? '');
+  const priorityId = String(formData.get('priorityId') ?? '');
+  const statusId = String(formData.get('statusId') ?? '');
+  const startDateValue = String(formData.get('startDate') ?? '');
+  const deadlineValue = String(formData.get('deadline') ?? '');
   const description = String(formData.get('description') ?? '');
 
   if (!taskName) {
@@ -29,23 +33,37 @@ export async function createTask(
     };
   }
 
+   if (!priorityId) {
+    return { error: '優先度を選択してください', };
+  }
+
+  if (!statusId) {
+    return { error: 'ステータスを選択してください', };
+  }
+
   const user = await prisma.user.findFirst();
   const project = await prisma.project.findFirst();
-  const priority = await prisma.priority.findFirst({
-    orderBy: {
-      sortOrder: 'asc',
-    },
-  });
-  const status = await prisma.status.findFirst({
-    orderBy: {
-      sortOrder: 'asc',
+
+  if (!user || !project) {
+    return {
+      error: 'タスク作成に必要な初期データが不足しています。',};
+  }
+
+  const status = await prisma.status.findUnique({
+    where: {
+      statusId,
     },
   });
 
-  if (!user || !project || !priority || !status) {
-    return {
-      error: 'タスク作成に必要な初期データが不足しています。',
-    };
+  if (!status) {
+    return { error: '選択されたステータスが存在しません', };
+  }
+
+  const startDate = startDateValue ? new Date(startDateValue) : null;
+  const deadline = deadlineValue ? new Date(deadlineValue) : null;
+
+  if (startDate && deadline && startDate > deadline) {
+    return { error: '開始日は期限日以前の日付を指定してください。', };
   }
 
   try {
@@ -55,8 +73,11 @@ export async function createTask(
         description: description || null,
         projectId: project.projectId,
         assigneeId: user.userId,
-        priorityId: priority.priorityId,
-        statusId: status.statusId,
+        priorityId,
+        statusId,
+        startDate,
+        deadline,
+        completedAt: status.isCompleted ? new Date() : null,
         createdBy: user.userId,
       },
     });
@@ -77,6 +98,10 @@ export async function updateTask (
   formData: FormData): Promise<UpdateTaskState> {
   const taskId = String(formData.get('taskId') ?? '');
   const taskName = String(formData.get('taskName') ?? '');
+  const priorityId = String(formData.get('priorityId') ?? '');
+  const statusId = String(formData.get('statusId') ?? '');
+  const startDateValue = String(formData.get('startDate') ?? '');
+  const deadlineValue = String(formData.get('deadline') ?? '');
   const description = String(formData.get('description') ?? '');
 
   if (!taskId) {
@@ -84,7 +109,30 @@ export async function updateTask (
   }
 
   if (!taskName) {
-    return { error: 'タスク名は必須です。', }
+    return { error: 'タスク名は必須です', }
+  }
+
+  if (!priorityId) {
+    return { error: '優先度を選択してください', };
+  }
+
+  if (!statusId) {
+    return { error: 'ステータスを選択してください', };
+  }
+
+  const status = await prisma.status.findUnique({
+    where: { statusId },
+  });
+
+  if (!status) {
+    return { error: '選択されたステータスが存在しません', };
+  }
+
+  const startDate = startDateValue ? new Date(startDateValue) : null;
+  const deadline = deadlineValue ? new Date(deadlineValue) : null;
+
+  if (startDate && deadline && startDate > deadline) {
+    return { error: '開始日は期限日以前の日付を指定してください。', };
   }
 
   try {
@@ -94,6 +142,11 @@ export async function updateTask (
       },
       data: {
         taskName,
+        priorityId,
+        statusId,
+        startDate,
+        deadline,
+        completedAt: status.isCompleted ? new Date() : null,
         description: description || null,
       },
     });
@@ -103,7 +156,8 @@ export async function updateTask (
   }
 
   revalidatePath('/tasks');
-  redirect('/tasks');
+  revalidatePath(`/tasks/${taskId}`);
+  redirect(`/tasks/${taskId}`);
 }
 export async function deleteTask (_prevState: DeleteTaskState,
   formData: FormData): Promise<DeleteTaskState> {

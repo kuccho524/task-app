@@ -3,11 +3,26 @@
 import { useActionState } from "react";
 import { createTask, type CreateTaskState } from "@/actions/taskActions";
 
+type Priority = {
+  priorityId: string;
+  priorityName: string;
+};
+
+type Status = {
+  statusId: string;
+  statusName: string;
+};
+
+type CreateTaskFormProps = {
+  priorities: Priority[];
+  statuses: Status[];
+};
+
 const initialState: CreateTaskState = {
   error: undefined,
 };
 
-export default function TaskCreateForm() {
+export default function TaskCreateForm({ priorities, statuses }: CreateTaskFormProps) {
 
   const [state, formAction, isPending] = useActionState(
     createTask,
@@ -26,6 +41,46 @@ export default function TaskCreateForm() {
       <div>
         <label className="mb-1 block text-sm font-medium">タスク名</label>
         <input name="taskName" className="w-full rounded border px-3 py-2" placeholder="タスク名を入力" />
+      </div>
+
+      <div>
+        <select name="priorityId" defaultValue="" className="w-full rounded border px-3 py-2">
+          <option value="">優先度を選択してください</option>
+          {priorities.map((priority) => (
+            <option key={priority.priorityId} value={priority.priorityId}>
+              {priority.priorityName}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <select name="statusId" defaultValue="" className="w-full rounded border px-3 px-2">
+          <option value="">ステータスを選択してください</option>
+          {statuses.map((status) => (
+            <option key={status.statusId} value={status.statusId}>
+              {status.statusName}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium">開始日</label>
+        <input
+          type="date"
+          name="startDate"
+          className="w-full rounded border px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium">期限日</label>
+        <input
+          type="date"
+          name="deadline"
+          className="w-full rounded border px-3 py-2"
+        />
       </div>
 
       <div>
