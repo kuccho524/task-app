@@ -12,7 +12,7 @@ export type UpdateTaskState = {
   error?: string;
 }
 
-export type GetTaskState = {
+export type DeleteTaskState = {
   error?: string;
 }
 
@@ -105,7 +105,26 @@ export async function updateTask (
   revalidatePath('/tasks');
   redirect('/tasks');
 }
+export async function deleteTask (_prevState: DeleteTaskState,
+  formData: FormData): Promise<DeleteTaskState> {
+  const taskId = String(formData.get('taskId') ?? '');
 
-export async function getTask(task: string) {
-  
+  if (!taskId) {
+    return { error: 'タスクIDを取得できませんでした' };
+  }
+
+  try {
+    await prisma.task.delete({
+      where: {
+        taskId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return { error: 'タスク削除中にエラーが発生しました' };
+  }
+
+  revalidatePath('/tasks');
+  redirect('/tasks');
 }

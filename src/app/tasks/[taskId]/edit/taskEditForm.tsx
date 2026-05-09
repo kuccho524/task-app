@@ -21,6 +21,12 @@ export default function TaskEditForm({ task }: TaskEditFormProps) {
     initialState
   );
 
+  const handleUpdate = async() => {
+    if (window.confirm('本当に更新しますか')) {
+      await updateTask;
+    }
+  }
+
   return (
     <form action={formAction} className="space-y-4">
       {state.error && (
@@ -42,7 +48,7 @@ export default function TaskEditForm({ task }: TaskEditFormProps) {
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" disabled={isPending} className="rounded bg-black px-4 px-2 text-white disabled:opacity-50">
+        <button type="submit" onClick={handleUpdate} disabled={isPending} className="rounded bg-black px-4 px-2 text-white disabled:opacity-50">
         {isPending ? '更新中...' : '更新'}
       </button>
 

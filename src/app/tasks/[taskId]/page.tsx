@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import DeleteTaskForm from './deleteTaskForm';
 
 type Props = {
   params: Promise<{
@@ -108,12 +109,13 @@ export default async function taskDetailPage({ params }: Props) {
           </div>
 
           <div className="flex gap-3">
-          <Link href="/tasks" className="rounded border px-4 py-2 text-sm hover:bg-gray-50">
-            一覧へ戻る
-          </Link>
+            <Link href="/tasks" className="rounded border px-4 py-2 text-sm hover:bg-gray-50">
+              一覧へ戻る
+            </Link>
 
-          <Link href={`/tasks/${task.taskId}/edit`} className="rounded bg-black px-4 py-2 text-sm text-white">編集</Link>
-        </div>
+            <Link href={`/tasks/${task.taskId}/edit`} className="rounded bg-black px-4 py-2 text-sm text-white">編集</Link>
+          </div>
+          <DeleteTaskForm taskId={task.taskId} />
         </div>
       </section>
     </main>
