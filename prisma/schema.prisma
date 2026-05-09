@@ -55,7 +55,7 @@ model Project {
 }
 
 model Task {
-  taskId      String    @id @default(uuid()) @map("task_id")
+  taskId      String    @id @default(dbgenerated("generate_task_id()")) @map("task_id")
   projectId   String    @map("project_id")
   taskName    String    @map("task_name")
   assigneeId  String    @map("assignee_id")
