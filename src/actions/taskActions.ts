@@ -1,12 +1,20 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { cacheTag, revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export type CreateTaskState = {
   error?: string;
 };
+
+export type UpdateTaskState = {
+  error?: string;
+}
+
+export type GetTaskState = {
+  error?: string;
+}
 
 export async function createTask(
   _prevState: CreateTaskState,
@@ -62,4 +70,42 @@ export async function createTask(
 
   revalidatePath('/tasks');
   redirect('/tasks');
+}
+
+export async function updateTask (
+  _prevState: UpdateTaskState,
+  formData: FormData): Promise<UpdateTaskState> {
+  const taskId = String(formData.get('taskId') ?? '');
+  const taskName = String(formData.get('taskName') ?? '');
+  const description = String(formData.get('description') ?? '');
+
+  if (!taskId) {
+    return { error: 'タスクIDを取得できませんでした', };
+  }
+
+  if (!taskName) {
+    return { error: 'タスク名は必須です。', }
+  }
+
+  try {
+    await prisma.task.update ({
+      where: {
+        taskId,
+      },
+      data: {
+        taskName,
+        description: description || null,
+      },
+    });
+  } catch(error) {
+    console.log(error);
+    return { error: 'タスク更新中にエラーが発生しました。' };
+  }
+
+  revalidatePath('/tasks');
+  redirect('/tasks');
+}
+
+export async function getTask(task: string) {
+  
 }

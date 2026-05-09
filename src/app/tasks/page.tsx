@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import Link from "next/link";
 
 export default async function taskPage() {
   const tasks = await prisma.task.findMany({
@@ -31,6 +32,11 @@ export default async function taskPage() {
             {task.description && (
               <p className="mt-3 text-sm">{task.description}</p>
             )}
+
+            <div>
+              <Link href={`/tasks/${task.taskId}`}>詳細</Link>
+              <Link href={`/tasks/${task.taskId}/edit`}>編集</Link>
+            </div>
           </div>
         ))}
       </div>

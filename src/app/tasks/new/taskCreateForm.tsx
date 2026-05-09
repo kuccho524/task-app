@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from "react";
-import { createTask, type CreateTaskState } from "../../../../actions/taskActions";
+import { createTask, type CreateTaskState } from "@/actions/taskActions";
 
 const initialState: CreateTaskState = {
   error: undefined,
@@ -24,13 +24,13 @@ export default function TaskCreateForm() {
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium">タイトル</label>
+        <label className="mb-1 block text-sm font-medium">タスク名</label>
         <input name="taskName" className="w-full rounded border px-3 py-2" placeholder="タスク名を入力" />
       </div>
 
       <div>
         <label className="mb-1 block text-sm font-medium">説明</label>
-        <input name="description" className="w-full rounded border px-3 py-2" placeholder="タスク名を入力" />
+        <textarea name="description" className="w-full rounded border px-3 py-2" placeholder="説明を入力" />
       </div>
 
       <button type="submit" disabled={isPending} className="rounded bg-black px-4 py-2 text-white">
