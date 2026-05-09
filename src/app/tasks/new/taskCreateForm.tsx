@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { createTask, type CreateTaskState } from "@/actions/taskActions";
+import Link from "next/link";
 
 type Priority = {
   priorityId: string;
@@ -91,6 +92,8 @@ export default function TaskCreateForm({ priorities, statuses }: CreateTaskFormP
       <button type="submit" disabled={isPending} className="rounded bg-black px-4 py-2 text-white">
         {isPending ? '作成中...' : '作成'}
       </button>
+
+      <Link href="/tasks" className="rounded bg-black px-4 py-2 text-white">一覧へ戻る</Link>
     </form>
   );
 }

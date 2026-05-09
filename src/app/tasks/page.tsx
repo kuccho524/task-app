@@ -18,6 +18,7 @@ export default async function taskPage() {
 
   return (
     <main className="mx-auto max-w-5xl p-8">
+      <Link href="/tasks/new" className="mb-6 text-2xl font-bold">新規作成</Link>
       <h1 className="mb-6 text-2xl font-bold">タスク一覧</h1>
       <div className="space-y-3">
         {tasks.map((task) => (
