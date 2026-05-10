@@ -14,12 +14,12 @@ datasource db {
 }
 
 model User {
-  userId       String   @id @default(uuid()) @map("user_id")
-  userName     String   @map("user_name")
-  userEmail    String   @unique @map("user_email")
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  userId    String   @id @map("user_id")
+  userCode  String   @unique @default(dbgenerated("generate_user_code()")) @map("user_code")
+  userName  String   @map("user_name")
+  userEmail String   @unique @map("user_email")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   assignedProjects Project[] @relation("ProjectAssignee")
   createdProjects  Project[] @relation("ProjectCreator")
