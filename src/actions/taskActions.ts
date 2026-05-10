@@ -33,7 +33,7 @@ export async function createTask(
     };
   }
 
-   if (!priorityId) {
+  if (!priorityId) {
     return { error: '優先度を選択してください', };
   }
 
