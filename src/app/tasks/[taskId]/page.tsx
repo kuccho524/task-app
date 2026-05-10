@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import DeleteTaskForm from './deleteTaskForm';
+import { requireAppUser } from "@/lib/auth";
 
 type Props = {
   params: Promise<{
@@ -14,6 +15,8 @@ export const dynamic = `force-dynamic`;
 export default async function taskDetailPage({ params }: Props) {
 
   const { taskId } = await params;
+
+  const appUser = await requireAppUser();
 
   const task = await prisma.task.findUnique({
     where: {
@@ -31,6 +34,8 @@ export default async function taskDetailPage({ params }: Props) {
   if (!task) {
     notFound();
   }
+
+  const canEdit = task.createdBy === appUser.userId;
 
   return (
     <main className="mx-auto max-w-3xl p-8">
@@ -113,7 +118,9 @@ export default async function taskDetailPage({ params }: Props) {
               一覧へ戻る
             </Link>
 
-            <Link href={`/tasks/${task.taskId}/edit`} className="rounded bg-black px-4 py-2 text-sm text-white">編集</Link>
+            {canEdit && (
+              <Link href={`/tasks/${task.taskId}/edit`} className="rounded bg-black px-4 py-2 text-sm text-white">編集</Link>
+            )}
           </div>
           <DeleteTaskForm taskId={task.taskId} />
         </div>

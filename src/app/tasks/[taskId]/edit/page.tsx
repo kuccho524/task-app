@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import TaskEditForm from "./taskEditForm";
+import { requireAppUser } from "@/lib/auth";
 
 type Props = {
   params: Promise<{
@@ -13,9 +14,12 @@ export const dynamic = 'force-dynamic';
 export default async function taskEditPage({ params }: Props) {
   const { taskId } = await params;
 
+  const appUser = await requireAppUser();
+
   const task = await prisma.task.findUnique({
     where: {
       taskId,
+      createdBy: appUser.userId,
     },
   });
 

@@ -1,11 +1,7 @@
-import { requireUser } from "@/lib/auth";
+import { requireAppUser } from "@/lib/auth";
 
-type TasksLayoutProps = {
-  children: React.ReactNode;
-};
-
-export default async function asksLayout({ children }: TasksLayoutProps) {
-  await requireUser();
+export default async function tasksLayout({ children, }: { children: React.ReactNode } ) {
+  await requireAppUser();
 
   return <>{children}</>;
 }

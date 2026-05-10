@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { requireAppUser } from '@/lib/auth';
 
 export type CreateTaskState = {
   error?: string;
@@ -41,10 +42,10 @@ export async function createTask(
     return { error: 'ステータスを選択してください', };
   }
 
-  const user = await prisma.user.findFirst();
+  const appUser = await requireAppUser();
   const project = await prisma.project.findFirst();
 
-  if (!user || !project) {
+  if (!project) {
     return {
       error: 'タスク作成に必要な初期データが不足しています。',};
   }
@@ -72,13 +73,13 @@ export async function createTask(
         taskName,
         description: description || null,
         projectId: project.projectId,
-        assigneeId: user.userId,
+        assigneeId: appUser.userId,
         priorityId,
         statusId,
         startDate,
         deadline,
         completedAt: status.isCompleted ? new Date() : null,
-        createdBy: user.userId,
+        createdBy: appUser.userId,
       },
     });
   } catch (error) {
@@ -103,6 +104,20 @@ export async function updateTask (
   const startDateValue = String(formData.get('startDate') ?? '');
   const deadlineValue = String(formData.get('deadline') ?? '');
   const description = String(formData.get('description') ?? '');
+
+  const appUser = await requireAppUser();
+
+  const existingTask = await prisma.task.findUnique({
+    where: { taskId, },
+  });
+
+  if (!existingTask) {
+    return { error: '対象のタスクが見つかりません', };
+  }
+
+  if (existingTask.createdBy !== appUser.userId) {
+    return { error: 'このタスクを編集する権限がありません', };
+  }
 
   if (!taskId) {
     return { error: 'タスクIDを取得できませんでした', };
@@ -161,7 +176,22 @@ export async function updateTask (
 }
 export async function deleteTask (_prevState: DeleteTaskState,
   formData: FormData): Promise<DeleteTaskState> {
+  
+  const appUser = await requireAppUser();
+
   const taskId = String(formData.get('taskId') ?? '');
+
+  const existingTask = await prisma.task.findUnique({
+    where: { taskId, },
+  });
+
+  if (!existingTask) {
+    return { error: '対象のタスクが見つかりません', };
+  }
+
+  if (existingTask.createdBy !== appUser.userId) {
+    return { error: 'このタスクを編集する権限がありません', };
+  }
 
   if (!taskId) {
     return { error: 'タスクIDを取得できませんでした' };
