@@ -1,9 +1,11 @@
 import { prisma } from "../../lib/prisma";
 import Link from "next/link";
+import { logout } from "@/actions/authActions";
 
 export const dynamic = 'force-dynamic';
 
 export default async function taskPage() {
+
   const tasks = await prisma.task.findMany({
     include: {
       project: true,
@@ -18,6 +20,10 @@ export default async function taskPage() {
 
   return (
     <main className="mx-auto max-w-5xl p-8">
+      <form action={logout}>
+        <button type="submit" className="rounded border px-4 py-2 text-sm">ログアウト</button>
+      </form>
+
       <Link href="/tasks/new" className="mb-6 text-2xl font-bold">新規作成</Link>
       <h1 className="mb-6 text-2xl font-bold">タスク一覧</h1>
       <div className="space-y-3">
