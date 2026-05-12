@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { requireAppUser } from "@/lib/auth";
+import DeleteProjectForm from "./deleteProjectForm";
 
 type Props = {
   params: Promise<{
@@ -64,6 +65,7 @@ export default async function projectDetailPage({params}: Props) {
         {canEdit && (
           <Link href={`/projects/${project.projectId}/edit`} className="rounded bg-black px-4 py-2 text-sm text-white">編集</Link>
         )}
+        {canEdit && <DeleteProjectForm projectId={project.projectId} />}
       </div>
       <section className="mb-8 rounded border p-4">
         <div className="mb-4">

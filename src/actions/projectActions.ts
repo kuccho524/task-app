@@ -13,6 +13,10 @@ export type UpdateProjectState = {
   error?: string;
 };
 
+export type DeleteProjectState = {
+  error?: string;
+};
+
 export async function createProject(
   _prevState: CreateProjectState,
   formData: FormData
@@ -165,4 +169,66 @@ export async function updateProject(
   revalidatePath('/projects');
   revalidatePath(`/projects/${projectId}`);
   redirect(`/projects/${projectId}`);
+}
+
+export async function deleteProject(
+  _prevState: DeleteProjectState,
+  formData: FormData
+): Promise<DeleteProjectState> {
+  const projectId = String(formData.get('projectId') ?? '');
+
+  if (!projectId) {
+    return {
+      error: 'プロジェクトIDを取得できませんでした。',
+    };
+  }
+
+  const appUser = await requireAppUser();
+
+  const existingProject = await prisma.project.findUnique({
+    where: {
+      projectId,
+    },
+  });
+
+  if (!existingProject) {
+    return {
+      error: '対象のプロジェクトが見つかりません。',
+    };
+  }
+
+  if (existingProject.createdBy !== appUser.userId) {
+    return {
+      error: 'このプロジェクトを削除する権限がありません。',
+    };
+  }
+
+  const taskCount = await prisma.task.count({
+    where: {
+      projectId,
+    },
+  });
+
+  if (taskCount > 0) {
+    return {
+      error: 'このプロジェクトに紐づくタスクが存在するため削除できません。',
+    };
+  }
+
+  try {
+    await prisma.project.delete({
+      where: {
+        projectId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return {
+      error: 'プロジェクト削除中にエラーが発生しました。',
+    };
+  }
+
+  revalidatePath('/projects');
+  redirect('/projects');
 }
