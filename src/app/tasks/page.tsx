@@ -24,7 +24,10 @@ export default async function taskPage() {
         <button type="submit" className="rounded border px-4 py-2 text-sm">ログアウト</button>
       </form>
 
-      <Link href="/tasks/new" className="mb-6 text-2xl font-bold">新規作成</Link>
+      <div className="gap-2 flex justify-between">
+        <Link href="/projects" className="mb-6 text-2xl font-bold">プロジェクト一覧へ</Link>
+        <Link href="/tasks/new" className="mb-6 text-2xl font-bold">新規作成</Link>
+      </div>
       <h1 className="mb-6 text-2xl font-bold">タスク一覧</h1>
       <div className="space-y-3">
         {tasks.map((task) => (

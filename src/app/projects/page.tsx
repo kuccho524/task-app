@@ -19,9 +19,12 @@ export default async function projectsPage() {
 
   return (
     <main className="mx-auto max-w-5xl p-8">
+      <div className="gap-2 flex justify-between">
+        <Link href="/tasks" className="rounded bg-black px-4 py-2 text-sm text-white">タスク一覧へ</Link>
+        <Link href="/projects/new" className="rounded bg-black px-4 py-2 text-sm text-white">新規作成</Link>
+      </div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">プロジェクト一覧</h1>
-        <Link href="/projects/new" className="rounded bg-black px-4 py-2 text-sm text-white">新規作成</Link>
       </div>
 
       {projects.length === 0 ? (

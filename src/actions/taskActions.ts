@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { requireAppUser } from '@/lib/auth';
 
@@ -22,32 +22,50 @@ export async function createTask(
   formData: FormData
 ): Promise<CreateTaskState> {
   const taskName = String(formData.get('taskName') ?? '');
+  const projectId = String(formData.get('projectId') ?? '');
   const priorityId = String(formData.get('priorityId') ?? '');
   const statusId = String(formData.get('statusId') ?? '');
   const startDateValue = String(formData.get('startDate') ?? '');
   const deadlineValue = String(formData.get('deadline') ?? '');
   const description = String(formData.get('description') ?? '');
+  const redirectTo = String(formData.get('redirectTo') ?? '');
 
-  if (!taskName) {
+  if (!taskName.trim()) {
     return {
       error: 'タスク名は必須です。',
     };
   }
 
+  if (!projectId) {
+    return {
+      error: 'プロジェクトを選択してください。',
+    };
+  }
+
   if (!priorityId) {
-    return { error: '優先度を選択してください', };
+    return {
+      error: '優先度を選択してください',
+    };
   }
 
   if (!statusId) {
-    return { error: 'ステータスを選択してください', };
+    return {
+      error: 'ステータスを選択してください',
+    };
   }
 
   const appUser = await requireAppUser();
-  const project = await prisma.project.findFirst();
+
+  const project = await prisma.project.findUnique({
+    where: {
+      projectId,
+    },
+  });
 
   if (!project) {
     return {
-      error: 'タスク作成に必要な初期データが不足しています。',};
+      error: '選択されたプロジェクトが存在しません。',
+    };
   }
 
   const status = await prisma.status.findUnique({
@@ -57,14 +75,18 @@ export async function createTask(
   });
 
   if (!status) {
-    return { error: '選択されたステータスが存在しません', };
+    return {
+      error: '選択されたステータスが存在しません',
+    };
   }
 
   const startDate = startDateValue ? new Date(startDateValue) : null;
   const deadline = deadlineValue ? new Date(deadlineValue) : null;
 
   if (startDate && deadline && startDate > deadline) {
-    return { error: '開始日は期限日以前の日付を指定してください。', };
+    return {
+      error: '開始日は期限日以前の日付を指定してください。',
+    };
   }
 
   try {
@@ -72,7 +94,7 @@ export async function createTask(
       data: {
         taskName,
         description: description || null,
-        projectId: project.projectId,
+        projectId,
         assigneeId: appUser.userId,
         priorityId,
         statusId,
@@ -91,6 +113,12 @@ export async function createTask(
   }
 
   revalidatePath('/tasks');
+  revalidatePath(`/projects/${projectId}`);
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+
   redirect('/tasks');
 }
 

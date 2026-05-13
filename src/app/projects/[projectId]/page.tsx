@@ -94,6 +94,9 @@ export default async function projectDetailPage({params}: Props) {
           <div className="mb-4 flex item-center justify-between">
             <h2 className="text-lg font-bold">関連タスク</h2>
             <span className="text-sm text-gray-500">{project.tasks.length}件</span>
+            <Link href={`/tasks/new?projectId=${project.projectId}&redirectTo=/projects/${project.projectId}`} className="rpinded bg-black px-4 py-2 text-sm text-white">
+              このプロジェクトにタスクを追加
+            </Link>
           </div>
 
           {project.tasks.length === 0 ? (
