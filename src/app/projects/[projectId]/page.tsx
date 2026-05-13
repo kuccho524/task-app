@@ -53,6 +53,16 @@ export default async function projectDetailPage({params}: Props) {
 
   const canEdit = project.createdBy === appUser.userId;
 
+  const totalTaskCount = project.tasks.length;
+
+  const completedTaskCount = project.tasks.filter(
+    (task) => task.status.isCompleted
+  ).length;
+
+  const incompleteTaskCount = totalTaskCount - completedTaskCount;
+
+  const progressRate = totalTaskCount === 0 ? 0 : Math.round((completedTaskCount / totalTaskCount) * 100);
+
   return (
     <main>
 
@@ -89,38 +99,90 @@ export default async function projectDetailPage({params}: Props) {
         </div>
       </section>
 
-      <section>
-        <div className="rounded border p-4">
-          <div className="mb-4 flex item-center justify-between">
-            <h2 className="text-lg font-bold">関連タスク</h2>
-            <span className="text-sm text-gray-500">{project.tasks.length}件</span>
-            <Link href={`/tasks/new?projectId=${project.projectId}&redirectTo=/projects/${project.projectId}`} className="rpinded bg-black px-4 py-2 text-sm text-white">
-              このプロジェクトにタスクを追加
-            </Link>
+      <section className="rounded border p-4">
+        <h2 className="mb-4 text-lg font-bold">タスク進捗</h2>
+
+        <div className="grid gap-3 sm:grid-cols-4">
+          <div className="rounded border p-3">
+            <p className="text-xs text-gray-500">関連タスク</p>
+            <p className="text-xl font-bold">{totalTaskCount}件</p>
           </div>
 
-          {project.tasks.length === 0 ? (
-            <p className="text-sm text-gray-600">このプロジェクトに紐づくタスクはありません</p>
-          ) : (
-            <div className="space-y-3">
-              {project.tasks.map((task) => (
-                <div key={task.taskId} className="rounded border p-3">
-                  <div className="mb-1 flex item-center justify-between">
-                    <Link href={`/tasks/${task.taskId}`} className="font-medium underline">{task.taskName}</Link>
-                    <span className="text-xs text-gray-500">{task.taskId}</span>
+          <div className="rounded border p-3">
+            <p className="text-xs text-gray-500">完了</p>
+            <p className="text-xl font-bold">{completedTaskCount}件</p>
+          </div>
+
+          <div className="rounded border p-3">
+            <p className="text-xs text-gray-500">未完了</p>
+            <p className="text-xl font-bold">{incompleteTaskCount}件</p>
+          </div>
+
+          <div className="rounded border p-3">
+            <p className="text-xs text-gray-500">進捗率</p>
+            <p className="text-xl font-bold">{progressRate}%</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded border p-4">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold">関連タスク</h2>
+
+          <Link
+            href={`/tasks/new?projectId=${project.projectId}&redirectTo=/projects/${project.projectId}`}
+            className="rounded bg-black px-4 py-2 text-sm text-white"
+          >
+            このProjectにTaskを追加
+          </Link>
+        </div>
+
+        {project.tasks.length === 0 ? (
+          <p className="text-sm text-gray-600">
+            このプロジェクトに紐づくタスクはありません。
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {project.tasks.map((task) => (
+              <div key={task.taskId} className="rounded border p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-500">{task.taskId}</p>
+                    <Link
+                      href={`/tasks/${task.taskId}`}
+                      className="text-base font-bold underline"
+                    >
+                      {task.taskName}
+                    </Link>
                   </div>
-                  
-                  <div className="space-y-1 text-sm text-gray-700">
-                    <p>担当者：{task.assignee.userName}</p>
-                    <p>優先度：{task.priority.priorityName}</p>
-                    <p>ステータス：{task.status.statusName}</p>
-                    <p>期限日：{task.deadline ? task.deadline.toLocaleDateString('ja-JP') : '未設定'}</p>
+
+                  <div className="text-right text-sm">
+                    <p>{task.status.statusName}</p>
+                    <p className="text-xs text-gray-500">
+                      {task.priority.priorityName}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+                <div className="grid gap-2 text-sm text-gray-700 sm:grid-cols-3">
+                  <p>担当者：{task.assignee.userName}</p>
+                  <p>
+                    期限日：
+                    {task.deadline
+                      ? task.deadline.toLocaleDateString('ja-JP')
+                      : '未設定'}
+                  </p>
+                  <p>
+                    完了日：
+                    {task.completedAt
+                      ? task.completedAt.toLocaleDateString('ja-JP')
+                      : '未完了'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   )
