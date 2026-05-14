@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import AppNav from "@/components/AppNav";
 
 export const dynamic = 'force-dynamic';
 
@@ -28,17 +29,11 @@ export default async function projectsPage() {
 
   return (
     <main className="mx-auto max-w-5xl p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">プロジェクト一覧</h1>
-      </div>
+
+      <AppNav />
 
       <div className="mb-6 flex items-center justify-between">
-        <Link
-          href="/tasks"
-          className="rounded bg-black px-4 py-2 text-sm text-white"
-        >
-          タスク一覧へ
-        </Link>
+        <h1 className="text-2xl font-bold">プロジェクト一覧</h1>
 
         <Link
           href="/projects/new"
