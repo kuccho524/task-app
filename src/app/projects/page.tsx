@@ -4,6 +4,16 @@ import AppNav from "@/components/AppNav";
 
 export const dynamic = 'force-dynamic';
 
+type Props = {
+  searchParams: Promise<{
+    projectId?: string,
+    statusId?: string,
+    priorityId?: string,
+    assigneeId?: string,
+    keyword?: string,
+  }>;
+};
+
 export default async function projectsPage() {
   const projects = await prisma.project.findMany({
     include: {

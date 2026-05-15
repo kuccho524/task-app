@@ -10,6 +10,7 @@ type Props = {
     statusId?: string,
     priorityId?: string,
     assigneeId?: string,
+    keyword?: string,
   }>;
 };
 
@@ -21,7 +22,7 @@ function formatDate(date: Date | null) {
 
 export default async function taskPage({ searchParams }: Props) {
 
-  const { projectId, statusId, priorityId, assigneeId } = await searchParams;
+  const { projectId, statusId, priorityId, assigneeId, keyword } = await searchParams;
 
   const projects = await prisma.project.findMany({
     orderBy: {
@@ -48,10 +49,29 @@ export default async function taskPage({ searchParams }: Props) {
   });
 
   const where = {
-    ...(projectId ? { projectId } : {}),
-    ...(statusId ? { statusId } : {}),
-    ...(priorityId ? { priorityId } : {}),
-    ...(assigneeId ? { assigneeId } : {}),
+    AND: [
+      projectId ? { projectId } : {},
+      statusId ? { statusId } : {},
+      priorityId ? { priorityId } : {},
+      assigneeId ? { assigneeId } : {},
+      keyword ? {
+        OR: [
+          {
+            taskName: {
+              contains: keyword,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            description: {
+              contains: keyword,
+              mode: 'insensitive' as const,
+            },
+          },
+        ],
+      }
+      : {},
+    ],
   };
 
 
@@ -150,6 +170,17 @@ export default async function taskPage({ searchParams }: Props) {
               ))}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">キーワード</label>
+          <input
+            type="text"
+            name="keyword"
+            defaultValue={keyword ?? ''}
+            className="w-full rounded border px-3 py-2"
+            placeholder="タスク名・説明で検索"
+          />
         </div>
 
         <div className="mt-4 flex gap-2">
