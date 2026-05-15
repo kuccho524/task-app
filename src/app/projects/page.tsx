@@ -14,8 +14,54 @@ type Props = {
   }>;
 };
 
-export default async function projectsPage() {
+export default async function projectsPage({ searchParams }: Props) {
+
+  const { statusId, priorityId, assigneeId, keyword }= await searchParams;
+
+  const statuses = await prisma.status.findMany({
+    orderBy: {
+      sortOrder: 'asc',
+    },
+  });
+
+  const priorities = await prisma.priority.findMany({
+    orderBy: {
+      sortOrder: 'asc',
+    },
+  });
+
+  const users = await prisma.user.findMany({
+    orderBy: {
+      userName: 'asc',
+    },
+  });
+
+  const where = {
+    AND: [
+      statusId ? { statusId } : {},
+      priorityId ? { priorityId } : {},
+      assigneeId ? { assigneeId } : {},
+      keyword ? {
+        OR: [
+          {
+            projectName: {
+              contains: keyword,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            description: {
+              contains: keyword,
+              mode: 'insensitive' as const,
+            },
+          },
+        ],
+      } : {},
+    ],
+  };
+
   const projects = await prisma.project.findMany({
+    where,
     include: {
       assignee: true,
       creator: true,
@@ -52,6 +98,82 @@ export default async function projectsPage() {
           新規作成
         </Link>
       </div>
+
+      <form method="get" className="mb-6 rounded border p-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium">キーワード</label>
+            <input
+              type="text"
+              name="keyword"
+              defaultValue={keyword ?? ''}
+              className="w-full rounded border px-3 py-2"
+              placeholder="Project名・説明で検索"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">Status</label>
+            <select
+              name="statusId"
+              defaultValue={statusId ?? ''}
+              className="w-full rounded border px-3 py-2"
+            >
+              <option value="">すべて</option>
+              {statuses.map((status) => (
+                <option key={status.statusId} value={status.statusId}>
+                  {status.statusName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">Priority</label>
+            <select
+              name="priorityId"
+              defaultValue={priorityId ?? ''}
+              className="w-full rounded border px-3 py-2"
+            >
+              <option value="">すべて</option>
+              {priorities.map((priority) => (
+                <option key={priority.priorityId} value={priority.priorityId}>
+                  {priority.priorityName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium">担当者</label>
+            <select
+              name="assigneeId"
+              defaultValue={assigneeId ?? ''}
+              className="w-full rounded border px-3 py-2"
+            >
+              <option value="">すべて</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.userName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          <button
+            type="submit"
+            className="rounded bg-black px-4 py-2 text-sm text-white"
+          >
+            絞り込み
+          </button>
+
+          <Link href="/projects" className="rounded border px-4 py-2 text-sm">
+            クリア
+          </Link>
+        </div>
+      </form>
 
       {projects.length === 0 ? (
         <p className="text-sm text-gray-600">プロジェクトがありません。</p>
