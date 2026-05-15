@@ -89,6 +89,24 @@ export default async function taskPage({ searchParams }: Props) {
     }
   });
 
+  const selectedProject = projects.find(
+    (project) => project.projectId === projectId
+  );
+
+  const selectedStatus = statuses.find(
+    (status) => status.statusId === statusId
+  );
+
+  const selectedPriority = priorities.find(
+    (priority) => priority.priorityId === priorityId
+  );
+
+  const selectedAssignee = users.find(
+    (user) => user.userId === assigneeId
+  );
+
+  const hasFilter = !!keyword || !!projectId || !!statusId || !!priorityId || !!assigneeId;
+
   return (
     <main className="mx-auto max-w-5xl p-8">
 
@@ -105,7 +123,7 @@ export default async function taskPage({ searchParams }: Props) {
         </Link>
       </div>
 
-      <form method="get" className="mb-6 rounded border p-4">
+      <form method="get" key={`${keyword ?? ''}-${projectId ?? ''}-${statusId ?? ''}-${priorityId ?? ''}-${assigneeId ?? ''}`} className="mb-6 rounded border p-4">
         <div className="grid gap-4 md:grid-cols-4">
           <div>
             <label className="mb-1 block text-sm font-medium">Project</label>
@@ -195,10 +213,48 @@ export default async function taskPage({ searchParams }: Props) {
             href="/tasks"
             className="rounded border px-4 py-2 text-sm"
           >
-            クリア
+            条件リセット
           </Link>
         </div>
       </form>
+
+      {hasFilter && (
+        <div className="mb-6 rounded border bg-gray-50 p-4 text-sm">
+          <p className="mb-2 font-bold">現在の絞り込み条件</p>
+
+          <div className="flex flex-wrap gap-2">
+            {keyword && (
+              <span className="rounded border bg-white px-3 py-1">
+                キーワード：{keyword}
+              </span>
+            )}
+
+            {selectedProject && (
+              <span className="rounded border bg-white px-3 py-1">
+                Project：{selectedProject.projectName}
+              </span>
+            )}
+
+            {selectedStatus && (
+              <span className="rounded border bg-white px-3 py-1">
+                Status：{selectedStatus.statusName}
+              </span>
+            )}
+
+            {selectedPriority && (
+              <span className="rounded border bg-white px-3 py-1">
+                Priority：{selectedPriority.priorityName}
+              </span>
+            )}
+
+            {selectedAssignee && (
+              <span className="rounded border bg-white px-3 py-1">
+                担当者：{selectedAssignee.userName}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {tasks.length === 0 ? (
         <p className="text-sm text-gray-600">タスクがありません。</p>
