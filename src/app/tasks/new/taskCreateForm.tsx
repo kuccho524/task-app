@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { createTask, type CreateTaskState } from "@/actions/taskActions";
+import Link from "next/link";
 
 type Priority = {
   priorityId: string;
@@ -49,23 +50,23 @@ export default function TaskCreateForm({
       )}
 
       {state.error && (
-        <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+        <div className="app-error-message">
           {state.error}
         </div>
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium">タスク名</label>
+        <label className="app-form-label">タスク名</label>
         <input
           name="taskName"
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
           placeholder="タスク名を入力"
         />
       </div>
 
       {selectedProject ? (
         <div>
-          <label className="mb-1 block text-sm font-medium">プロジェクト</label>
+          <label className="app-form-label">プロジェクト</label>
           <p className="rounded border bg-gray-50 px-3 py-2 text-sm">
             {selectedProject.projectName}
           </p>
@@ -77,11 +78,11 @@ export default function TaskCreateForm({
         </div>
       ) : (
         <div>
-          <label className="mb-1 block text-sm font-medium">プロジェクト</label>
+          <label className="app-form-label">プロジェクト</label>
           <select
             name="projectId"
             defaultValue=""
-            className="w-full rounded border px-3 py-2"
+            className="app-form-input"
           >
             <option value="">プロジェクトを選択してください</option>
             {projects.map((project) => (
@@ -94,11 +95,11 @@ export default function TaskCreateForm({
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium">優先度</label>
+        <label className="app-form-label">優先度</label>
         <select
           name="priorityId"
           defaultValue=""
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         >
           <option value="">優先度を選択してください</option>
           {priorities.map((priority) => (
@@ -110,11 +111,11 @@ export default function TaskCreateForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">ステータス</label>
+        <label className="app-form-label">ステータス</label>
         <select
           name="statusId"
           defaultValue=""
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         >
           <option value="">ステータスを選択してください</option>
           {statuses.map((status) => (
@@ -126,39 +127,45 @@ export default function TaskCreateForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">開始日</label>
+        <label className="app-form-label">開始日</label>
         <input
           type="date"
           name="startDate"
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">期限日</label>
+        <label className="app-form-label">期限日</label>
         <input
           type="date"
           name="deadline"
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">説明</label>
+        <label className="app-form-label">説明</label>
         <textarea
           name="description"
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input min-h-32"
           placeholder="説明を入力"
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-      >
-        {isPending ? '作成中...' : '作成'}
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="app-btn-primary"
+        >
+          {isPending ? '作成中...' : '作成'}
+        </button>
+
+        <Link href={redirectTo || '/tasks'} className="app-btn-secondary">
+          キャンセル
+        </Link>
+      </div>
     </form>
   );
 }

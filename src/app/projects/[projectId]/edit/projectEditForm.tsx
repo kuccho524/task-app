@@ -62,7 +62,7 @@ export default function ProjectEditForm({
   return (
     <form action={formAction} onSubmit={handleSubmit} className="space-y-4">
       {state.error && (
-        <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+        <div className="app-error-message">
           {state.error}
         </div>
       )}
@@ -70,21 +70,21 @@ export default function ProjectEditForm({
       <input type="hidden" name="projectId" value={project.projectId} />
 
       <div>
-        <label className="mb-1 block text-sm font-medium">プロジェクト名</label>
+        <label className="app-form-label">プロジェクト名</label>
         <input
           name="projectName"
           defaultValue={project.projectName}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
           placeholder="プロジェクト名を入力"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">優先度</label>
+        <label className="app-form-label">優先度</label>
         <select
           name="priorityId"
           defaultValue={project.priorityId}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         >
           {priorities.map((priority) => (
             <option key={priority.priorityId} value={priority.priorityId}>
@@ -95,11 +95,11 @@ export default function ProjectEditForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">ステータス</label>
+        <label className="app-form-label">ステータス</label>
         <select
           name="statusId"
           defaultValue={project.statusId}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         >
           {statuses.map((status) => (
             <option key={status.statusId} value={status.statusId}>
@@ -110,31 +110,31 @@ export default function ProjectEditForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">開始日</label>
+        <label className="app-form-label">開始日</label>
         <input
           type="date"
           name="startDate"
           defaultValue={formatDateForInput(project.startDate)}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">期限日</label>
+        <label className="app-form-label">期限日</label>
         <input
           type="date"
           name="deadline"
           defaultValue={formatDateForInput(project.deadline)}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">説明</label>
+        <label className="app-form-label">説明</label>
         <textarea
           name="description"
           defaultValue={project.description ?? ''}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input min-h-32"
           placeholder="説明を入力"
         />
       </div>
@@ -143,14 +143,14 @@ export default function ProjectEditForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+          className="app-btn-primary"
         >
           {isPending ? '更新中...' : '更新'}
         </button>
 
         <Link
           href={`/projects/${project.projectId}`}
-          className="rounded border px-4 py-2 text-sm"
+          className="app-btn-secondary"
         >
           詳細へ戻る
         </Link>

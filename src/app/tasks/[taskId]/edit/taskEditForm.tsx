@@ -54,7 +54,7 @@ export default function TaskEditForm({ task, priorities, statuses }: TaskEditFor
   return (
     <form action={formAction} onSubmit={handleUpdate} className="space-y-4">
       {state.error && (
-        <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+        <div className="app-error-message">
           {state.error}
         </div>
       )}
@@ -62,16 +62,16 @@ export default function TaskEditForm({ task, priorities, statuses }: TaskEditFor
       <input type="hidden" name="taskId" value={task.taskId} />
 
       <div>
-        <label className="mb-1 block text-sm font-medium">タスク名</label>
-        <input name="taskName" defaultValue={task.taskName} className="w-full rounded border px-3 py-2" placeholder="タスク名を入力" />
+        <label className="app-form-label">タスク名</label>
+        <input name="taskName" defaultValue={task.taskName} className="app-form-input" placeholder="タスク名を入力" />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">優先度</label>
+        <label className="app-form-label">優先度</label>
         <select
           name="priorityId"
           defaultValue={task.priorityId}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         >
           {priorities.map((priority) => (
             <option key={priority.priorityId} value={priority.priorityId}>
@@ -82,11 +82,11 @@ export default function TaskEditForm({ task, priorities, statuses }: TaskEditFor
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">ステータス</label>
+        <label className="app-form-label">ステータス</label>
         <select
           name="statusId"
           defaultValue={task.statusId}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         >
           {statuses.map((status) => (
             <option key={status.statusId} value={status.statusId}>
@@ -97,36 +97,36 @@ export default function TaskEditForm({ task, priorities, statuses }: TaskEditFor
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">開始日</label>
+        <label className="app-form-label">開始日</label>
         <input
           type="date"
           name="startDate"
           defaultValue={formatDateForInput(task.startDate)}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">期限日</label>
+        <label className="app-form-label">期限日</label>
         <input
           type="date"
           name="deadline"
           defaultValue={formatDateForInput(task.deadline)}
-          className="w-full rounded border px-3 py-2"
+          className="app-form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">説明</label>
-        <textarea name="description" defaultValue={task.description ?? ''} className="w-full rounded border px-3 py-2" placeholder="説明を入力"></textarea>
+        <label className="app-form-label">説明</label>
+        <textarea name="description" defaultValue={task.description ?? ''} className="app-form-input min-h-32" placeholder="説明を入力"></textarea>
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" disabled={isPending} className="rounded bg-black px-4 px-2 text-white disabled:opacity-50">
+        <button type="submit" disabled={isPending} className="app-btn-primary">
         {isPending ? '更新中...' : '更新'}
       </button>
 
-      <Link href={`/tasks/${task.taskId}`} className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50">詳細へ戻る</Link>
+      <Link href={`/tasks/${task.taskId}`} className="app-btn-secondary">詳細へ戻る</Link>
       </div>
     </form>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import ProjectCreateForm from "./projectCreateForm";
+import AppNav from "@/components/AppNav";
 
 export const dynamic = 'force-dynamic';
 
@@ -19,14 +20,25 @@ export default async function newProjectPage() {
   });
 
   return (
-    <main className="mx-auto max-w-2xl p-8">
-      <div className="mb-6 flex item-center justify-between">
-        <h1 className="text-2xl font-bold">プロジェクト作成</h1>
+    <main className="app-page">
+      <AppNav />
 
-        <Link href="/projects" className="rounded border px-4 py-2 text-sm">一覧へ戻る</Link>
+      <div className="app-page-header">
+        <div>
+          <h1 className="app-page-title">プロジェクト作成</h1>
+          <p className="app-page-description">
+            新しいプロジェクトを登録します。
+          </p>
+        </div>
+
+        <Link href="/tasks" className="app-btn-secondary">
+          一覧へ戻る
+        </Link>
       </div>
 
-      <ProjectCreateForm priorities={priorities} statuses={statuses} />
+      <section className="app-card">
+        <ProjectCreateForm priorities={priorities} statuses={statuses} />
+      </section>
     </main>
   )
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import TaskCreateForm from "./taskCreateForm";
 import { prisma } from "@/lib/prisma";
+import AppNav from "@/components/AppNav";
 
 type Props = {
   searchParams: Promise<{
@@ -36,12 +37,25 @@ export default async function newTaskPage({ searchParams }: Props) {
   }) : null;
 
   return (
-    <main className="mx-auto max-w-2xl p-8">
-      <h1 className="mb-6 text-2xl font-bold">タスク作成</h1>
-      <Link href={redirectTo || '/tasks'} className="rounded border px-4 py-2 text-sm">
-        戻る
-      </Link>
-      <TaskCreateForm priorities={priorities} statuses={statuses} projects={projects} selectedProject={selectedProject} redirectTo={redirectTo} />
+    <main className="app-page">
+      <AppNav />
+
+      <div className="app-page-header">
+        <div>
+          <h1 className="app-page-title">タスク作成</h1>
+          <p className="app-page-description">
+            新しいタスクを登録します。
+          </p>
+        </div>
+
+        <Link href="/tasks" className="app-btn-secondary">
+          一覧へ戻る
+        </Link>
+      </div>
+
+      <section className="app-card">
+        <TaskCreateForm priorities={priorities} statuses={statuses} projects={projects} selectedProject={selectedProject} redirectTo={redirectTo} />
+      </section>
     </main>
   );
 }
