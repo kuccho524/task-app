@@ -108,29 +108,31 @@ export default async function taskPage({ searchParams }: Props) {
   const hasFilter = !!keyword || !!projectId || !!statusId || !!priorityId || !!assigneeId;
 
   return (
-    <main className="mx-auto max-w-5xl p-8">
+    <main className="app-page">
 
       <AppNav />
 
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">タスク一覧</h1>
+      <div className="app-page-header">
+        <div>
+          <h1 className="app-page-title">タスク一覧</h1>
+          <p className="app-page-description">
+            登録済みタスクの確認・検索・絞り込みができます。
+          </p>
+        </div>
 
-        <Link
-          href="/tasks/new"
-          className="rounded bg-black px-4 py-2 text-sm text-white"
-        >
+        <Link href="/tasks/new" className="app-btn-primary">
           新規作成
         </Link>
       </div>
 
-      <form method="get" key={`${keyword ?? ''}-${projectId ?? ''}-${statusId ?? ''}-${priorityId ?? ''}-${assigneeId ?? ''}`} className="mb-6 rounded border p-4">
-        <div className="grid gap-4 md:grid-cols-4">
+      <form method="get" key={`${keyword ?? ''}-${projectId ?? ''}-${statusId ?? ''}-${priorityId ?? ''}-${assigneeId ?? ''}`} className="app-filter-form">
+        <div className="app-filter-grid">
           <div>
-            <label className="mb-1 block text-sm font-medium">Project</label>
+            <label className="app-form-label">Project</label>
             <select
               name="projectId"
               defaultValue={projectId ?? ''}
-              className="w-full rounded border px-3 py-2"
+              className="app-form-input"
             >
               <option value="">すべて</option>
               {projects.map((project) => (
@@ -142,11 +144,11 @@ export default async function taskPage({ searchParams }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Status</label>
+            <label className="app-form-label">Status</label>
             <select
               name="statusId"
               defaultValue={statusId ?? ''}
-              className="w-full rounded border px-3 py-2"
+              className="app-form-input"
             >
               <option value="">すべて</option>
               {statuses.map((status) => (
@@ -158,11 +160,11 @@ export default async function taskPage({ searchParams }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Priority</label>
+            <label className="app-form-label">Priority</label>
             <select
               name="priorityId"
               defaultValue={priorityId ?? ''}
-              className="w-full rounded border px-3 py-2"
+              className="app-form-input"
             >
               <option value="">すべて</option>
               {priorities.map((priority) => (
@@ -174,11 +176,11 @@ export default async function taskPage({ searchParams }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">担当者</label>
+            <label className="app-form-label">担当者</label>
             <select
               name="assigneeId"
               defaultValue={assigneeId ?? ''}
-              className="w-full rounded border px-3 py-2"
+              className="app-form-input"
             >
               <option value="">すべて</option>
               {users.map((user) => (
@@ -191,12 +193,12 @@ export default async function taskPage({ searchParams }: Props) {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">キーワード</label>
+          <label className="app-form-label">キーワード</label>
           <input
             type="text"
             name="keyword"
             defaultValue={keyword ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="app-form-input"
             placeholder="タスク名・説明で検索"
           />
         </div>
@@ -204,14 +206,14 @@ export default async function taskPage({ searchParams }: Props) {
         <div className="mt-4 flex gap-2">
           <button
             type="submit"
-            className="rounded bg-black px-4 py-2 text-sm text-white"
+            className="app-btn-primary"
           >
             絞り込み
           </button>
 
           <Link
             href="/tasks"
-            className="rounded border px-4 py-2 text-sm"
+            className="app-btn-secondary"
           >
             条件リセット
           </Link>
@@ -219,36 +221,36 @@ export default async function taskPage({ searchParams }: Props) {
       </form>
 
       {hasFilter && (
-        <div className="mb-6 rounded border bg-gray-50 p-4 text-sm">
+        <div className="app-condition-box">
           <p className="mb-2 font-bold">現在の絞り込み条件</p>
 
           <div className="flex flex-wrap gap-2">
             {keyword && (
-              <span className="rounded border bg-white px-3 py-1">
+              <span className="app-condition-tag">
                 キーワード：{keyword}
               </span>
             )}
 
             {selectedProject && (
-              <span className="rounded border bg-white px-3 py-1">
+              <span className="app-condition-tag">
                 Project：{selectedProject.projectName}
               </span>
             )}
 
             {selectedStatus && (
-              <span className="rounded border bg-white px-3 py-1">
+              <span className="app-condition-tag">
                 Status：{selectedStatus.statusName}
               </span>
             )}
 
             {selectedPriority && (
-              <span className="rounded border bg-white px-3 py-1">
+              <span className="app-condition-tag">
                 Priority：{selectedPriority.priorityName}
               </span>
             )}
 
             {selectedAssignee && (
-              <span className="rounded border bg-white px-3 py-1">
+              <span className="app-condition-tag">
                 担当者：{selectedAssignee.userName}
               </span>
             )}
@@ -261,7 +263,7 @@ export default async function taskPage({ searchParams }: Props) {
       ) : (
         <div className="space-y-4">
           {tasks.map((task) => (
-            <div key={task.taskId} className="rounded border p-4">
+            <div key={task.taskId} className="app-card">
               <div className="mb-2 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-500">{task.taskId}</p>

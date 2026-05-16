@@ -3,46 +3,36 @@ import { logout } from '@/actions/authActions';
 
 export default function AppNav() {
   return (
-    <nav className="mb-6 rounded border p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex gap-3">
-          <Link
-            href="/projects"
-            className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
-          >
+    <nav className="mb-8 app-card">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold">Task App</p>
+          <p className="text-xs text-gray-500">Project / Task Management</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/projects" className="app-btn-secondary">
             Project一覧
           </Link>
 
-          <Link
-            href="/tasks"
-            className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
-          >
+          <Link href="/tasks" className="app-btn-secondary">
             Task一覧
           </Link>
 
-          <Link
-            href="/projects/new"
-            className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
-          >
+          <Link href="/projects/new" className="app-btn-primary">
             Project作成
           </Link>
 
-          <Link
-            href="/tasks/new"
-            className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
-          >
+          <Link href="/tasks/new" className="app-btn-primary">
             Task作成
           </Link>
-        </div>
 
-        <form action={logout}>
-          <button
-            type="submit"
-            className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
-          >
-            ログアウト
-          </button>
-        </form>
+          <form action={logout}>
+            <button type="submit" className="app-btn-secondary">
+              ログアウト
+            </button>
+          </form>
+        </div>
       </div>
     </nav>
   );

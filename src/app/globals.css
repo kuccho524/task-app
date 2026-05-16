@@ -19,6 +19,72 @@
   }
 }
 
+@layer components {
+  .app-page {
+    @apply mx-auto max-w-6xl p-8;
+  }
+
+  .app-card {
+    @apply rounded-lg border bg-white p-4 shadow-sm;
+  }
+
+  .app-panel {
+    @apply rounded-lg border bg-gray-50 p-4;
+  }
+
+  .app-page-header {
+    @apply mb-6 flex flex-wrap items-center justify-between gap-4;
+  }
+
+  .app-page-title {
+    @apply text-2xl font-bold;
+  }
+
+  .app-page-description {
+    @apply text-sm text-gray-500;
+  }
+
+  .app-btn-primary {
+    @apply rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50;
+  }
+
+  .app-btn-secondary {
+    @apply rounded border bg-white px-4 py-2 text-sm hover:bg-gray-50;
+  }
+
+  .app-filter-form {
+    @apply mb-6 rounded-lg border bg-gray-50 p-4;
+  }
+
+  .app-filter-grid {
+    @apply grid gap-4 md:grid-cols-4;
+  }
+
+  .app-form-label {
+    @apply mb-1 block text-sm font-medium;
+  }
+
+  .app-form-input {
+    @apply w-full rounded border px-3 py-2;
+  }
+
+  .app-condition-box {
+    @apply mb-6 rounded-lg border bg-white p-4 text-sm shadow-sm;
+  }
+
+  .app-condition-tag {
+    @apply rounded-full border bg-gray-50 px-3 py-1;
+  }
+
+  .app-empty-message {
+    @apply text-sm text-gray-600;
+  }
+
+  .app-error-message {
+    @apply rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
