@@ -83,6 +83,10 @@
   .app-error-message {
     @apply rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700;
   }
+
+  .app-empty-message {
+    @apply text-sm text-gray-600;
+  }
 }
 
 body {

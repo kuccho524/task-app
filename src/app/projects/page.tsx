@@ -224,7 +224,13 @@ export default async function projectsPage({ searchParams }: Props) {
       )}
 
       {projects.length === 0 ? (
-        <p className="text-sm text-gray-600">プロジェクトがありません。</p>
+        <p className="app-empty-message">
+          {
+            hasFilter
+            ? '条件に一致するプロジェクトがありません。検索条件を変更してください。'
+            : 'プロジェクトがありません。新規作成からプロジェクトを追加してください。'
+          }
+        </p>
       ) : (
         <div className="space-y-4">
           {projects.map((project) => {

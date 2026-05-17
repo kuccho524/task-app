@@ -153,7 +153,7 @@ export default async function projectDetailPage({params}: Props) {
 
         {project.tasks.length === 0 ? (
           <p className="app-empty-message">
-            このプロジェクトに紐づくタスクはありません。
+            このプロジェクトに紐づくタスクはありません。「このProjectにTaskを追加」から登録してください。
           </p>
         ) : (
           <div className="space-y-3">

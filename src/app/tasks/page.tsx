@@ -259,7 +259,13 @@ export default async function taskPage({ searchParams }: Props) {
       )}
 
       {tasks.length === 0 ? (
-        <p className="text-sm text-gray-600">タスクがありません。</p>
+        <p className="app-empty-message">
+          {
+            hasFilter
+            ? '条件に一致するタスクがありません。検索条件を変更してください'
+            : 'タスクがありません。新規タスクから登録してください。'
+          }
+        </p>
       ) : (
         <div className="space-y-4">
           {tasks.map((task) => (
