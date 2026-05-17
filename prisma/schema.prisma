@@ -19,7 +19,7 @@ model User {
   userName  String   @map("user_name")
   userEmail String   @unique @map("user_email")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   assignedProjects Project[] @relation("ProjectAssignee")
   createdProjects  Project[] @relation("ProjectCreator")
@@ -31,7 +31,7 @@ model User {
 }
 
 model Project {
-  projectId   String    @id @default(uuid()) @map("project_id")
+  projectId   String @id @default(dbgenerated("generate_project_id()")) @map("project_id")
   projectName String    @map("project_name")
   assigneeId  String    @map("assignee_id")
   priorityId  String    @map("priority_id")
@@ -42,7 +42,7 @@ model Project {
   completedAt DateTime? @map("completed_at")
   createdBy   String    @map("created_by")
   createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
 
   assignee User      @relation("ProjectAssignee", fields: [assigneeId], references: [userId])
   creator  User      @relation("ProjectCreator", fields: [createdBy], references: [userId])

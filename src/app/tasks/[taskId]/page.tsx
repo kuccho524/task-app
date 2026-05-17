@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import DeleteTaskForm from './deleteTaskForm';
+import DeleteTaskForm from "./deleteTaskForm";
+import { requireAppUser } from "@/lib/auth";
+import AppNav from "@/components/AppNav";
 
 type Props = {
   params: Promise<{
@@ -9,11 +11,22 @@ type Props = {
   }>;
 };
 
-export const dynamic = `force-dynamic`;
+export const dynamic = "force-dynamic";
+
+function formatDate(date: Date | null, fallback = "未設定") {
+  if (!date) return fallback;
+
+  return date.toLocaleDateString("ja-JP");
+}
+
+function formatDateTime(date: Date) {
+  return date.toLocaleString("ja-JP");
+}
 
 export default async function taskDetailPage({ params }: Props) {
-
   const { taskId } = await params;
+
+  const appUser = await requireAppUser();
 
   const task = await prisma.task.findUnique({
     where: {
@@ -32,92 +45,58 @@ export default async function taskDetailPage({ params }: Props) {
     notFound();
   }
 
+  const canEdit = task.createdBy === appUser.userId;
+
   return (
-    <main className="mx-auto max-w-3xl p-8">
-      <div className="mb-6 flex item-center justfy-between">
-        <h1 className="text-2xl font-bold">タスク詳細</h1>
-      </div>
-      <section className="rounded border bg-white p-6">
-        <h2 className="mb-4 text-xl font-semibold">{task.taskName}</h2>
+    <main className="app-page">
+      <AppNav />
 
-        <div className="space-y-3 text-sm">
-          <div>
-            <span className="font-medium">説明：</span>
-            <span>{task.description || '未入力'}</span>
-          </div>
+      <div className="app-page-header">
+        <div>
+          <h1 className="app-page-title">タスク詳細</h1>
+          <p className="app-page-description">
+            タスクの詳細情報を確認できます。
+          </p>
+        </div>
 
-          <div>
-            <span className="font-medium">プロジェクト：</span>
-            <span>{task.project.projectName}</span>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/tasks" className="app-btn-secondary">
+            一覧へ戻る
+          </Link>
 
-          <div>
-            <span className="font-medium">担当者：</span>
-            <span>{task.assignee.userName}</span>
-          </div>
-
-          <div>
-            <span className="font-medium">作成者：</span>
-            <span>{task.creator.userName}</span>
-          </div>
-
-          <div>
-            <span className="font-medium">優先度：</span>
-            <span>{task.priority.priorityName}</span>
-          </div>
-
-          <div>
-            <span className="font-medium">ステータス：</span>
-            <span>{task.status.statusName}</span>
-          </div>
-
-          <div>
-            <span className="font-medium">開始日：</span>
-            <span>
-              {task.startDate
-                ? task.startDate.toLocaleDateString('ja-JP')
-                : '未設定'}
-            </span>
-          </div>
-
-          <div>
-            <span className="font-medium">期限：</span>
-            <span>
-              {task.deadline
-                ? task.deadline.toLocaleDateString('ja-JP')
-                : '未設定'}
-            </span>
-          </div>
-
-          <div>
-            <span className="font-medium">完了日：</span>
-            <span>
-              {task.completedAt
-                ? task.completedAt.toLocaleDateString('ja-JP')
-                : '未完了'}
-            </span>
-          </div>
-
-          <div>
-            <span className="font-medium">作成日時：</span>
-            <span>{task.createdAt.toLocaleString('ja-JP')}</span>
-          </div>
-
-          <div>
-            <span className="font-medium">更新日時：</span>
-            <span>{task.updatedAt.toLocaleString('ja-JP')}</span>
-          </div>
-
-          <div className="flex gap-3">
-            <Link href="/tasks" className="rounded border px-4 py-2 text-sm hover:bg-gray-50">
-              一覧へ戻る
+          {canEdit && (
+            <Link
+              href={`/tasks/${task.taskId}/edit`}
+              className="app-btn-primary"
+            >
+              編集
             </Link>
+          )}
 
-            <Link href={`/tasks/${task.taskId}/edit`} className="rounded bg-black px-4 py-2 text-sm text-white">編集</Link>
-          </div>
-          <DeleteTaskForm taskId={task.taskId} />
+          {canEdit && <DeleteTaskForm taskId={task.taskId} />}
+        </div>
+      </div>
+
+      <section className="app-card mb-6">
+        <div className="mb-4">
+          <p className="text-xs text-gray-500">{task.taskId}</p>
+          <h2 className="text-xl font-bold">{task.taskName}</h2>
+        </div>
+
+        <div className="grid gap-2 text-sm text-gray-700 sm:grid-cols-2">
+          <p>Project：{task.project.projectName}</p>
+          <p>説明：{task.description || "未設定"}</p>
+          <p>担当者：{task.assignee.userName}</p>
+          <p>作成者：{task.creator.userName}</p>
+          <p>優先度：{task.priority.priorityName}</p>
+          <p>ステータス：{task.status.statusName}</p>
+          <p>開始日：{formatDate(task.startDate)}</p>
+          <p>期限日：{formatDate(task.deadline)}</p>
+          <p>完了日：{formatDate(task.completedAt, "未完了")}</p>
+          <p>作成日：{formatDateTime(task.createdAt)}</p>
+          <p>更新日：{formatDateTime(task.updatedAt)}</p>
         </div>
       </section>
     </main>
-  )
+  );
 }

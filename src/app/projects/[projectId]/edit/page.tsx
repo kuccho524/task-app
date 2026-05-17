@@ -1,40 +1,46 @@
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import TaskEditForm from "./taskEditForm";
+import { Prisma } from "@prisma/client";
 import { requireAppUser } from "@/lib/auth";
+import ProjectEditForm from "./projectEditForm";
+import { prisma } from "@/lib/prisma";
 import AppNav from "@/components/AppNav";
 import Link from "next/link";
 
 type Props = {
-  params: Promise<{
-    taskId: string;
+  params: Promise <{
+    projectId: string;
   }>;
 };
 
 export const dynamic = 'force-dynamic';
 
-export default async function taskEditPage({ params }: Props) {
-  const { taskId } = await params;
+export default async function ProjectCreatePage ({ params }: Props) {
+  
+  const { projectId } = await params;
 
   const appUser = await requireAppUser();
 
-  const task = await prisma.task.findUnique({
+  const project = await prisma.project.findUnique({
     where: {
-      taskId,
+      projectId,
       createdBy: appUser.userId,
     },
   });
 
-  if (!task) {
+  if (!project) {
     notFound();
   }
 
   const priorities = await prisma.priority.findMany({
-    orderBy: { sortOrder: 'asc' },
+    orderBy: {
+      sortOrder: 'asc',
+    },
   });
 
   const statuses = await prisma.status.findMany({
-    orderBy: { sortOrder: 'asc' },
+    orderBy: {
+      sortOrder: 'asc',
+    },
   });
 
   return (
@@ -43,19 +49,19 @@ export default async function taskEditPage({ params }: Props) {
 
       <div className="app-page-header">
         <div>
-          <h1 className="app-page-title">タスク編集</h1>
+          <h1 className="app-page-title">プロジェクト編集</h1>
           <p className="app-page-description">
-            タスクの内容を編集します。
+            プロジェクト内容を編集します。
           </p>
         </div>
 
-        <Link href={`/tasks/${task.taskId}`} className="app-btn-secondary">
+        <Link href={`/projects/${project.projectId}`} className="app-btn-secondary">
           詳細へ戻る
         </Link>
       </div>
 
       <section className="app-card">
-        <TaskEditForm task={task} priorities={priorities} statuses={statuses} />
+        <ProjectEditForm project={project} priorities={priorities} statuses={statuses} />
       </section>
     </main>
   )

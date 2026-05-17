@@ -1,8 +1,11 @@
 'use client';
 
-import { useActionState } from "react";
-import { createTask, type CreateTaskState } from "@/actions/taskActions";
-import Link from "next/link";
+import Link from 'next/link';
+import { useActionState } from 'react';
+import {
+  updateProject,
+  type UpdateProjectState,
+} from '@/actions/projectActions';
 
 type Priority = {
   priorityId: string;
@@ -14,94 +17,75 @@ type Status = {
   statusName: string;
 };
 
-type Project = {
-  projectId: string;
-  projectName: string;
-};
-
-type TaskCreateFormProps = {
+type ProjectEditFormProps = {
+  project: {
+    projectId: string;
+    projectName: string;
+    description: string | null;
+    priorityId: string;
+    statusId: string;
+    startDate: Date | null;
+    deadline: Date | null;
+  };
   priorities: Priority[];
   statuses: Status[];
-  projects: Project[];
-  selectedProject: Project | null;
-  redirectTo?: string;
 };
 
-const initialState: CreateTaskState = {
+const initialState: UpdateProjectState = {
   error: undefined,
 };
 
-export default function TaskCreateForm({
+function formatDateForInput(date: Date | null) {
+  if (!date) return '';
+
+  return date.toISOString().split('T')[0];
+}
+
+export default function ProjectEditForm({
+  project,
   priorities,
   statuses,
-  projects,
-  selectedProject,
-  redirectTo,
-}: TaskCreateFormProps) {
+}: ProjectEditFormProps) {
   const [state, formAction, isPending] = useActionState(
-    createTask,
+    updateProject,
     initialState
   );
 
-  return (
-    <form action={formAction} className="space-y-4">
-      {redirectTo && (
-        <input type="hidden" name="redirectTo" value={redirectTo} />
-      )}
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const result = window.confirm('本当に更新しますか？');
 
+    if (!result) {
+      event.preventDefault();
+    }
+  };
+
+  return (
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-4">
       {state.error && (
         <div className="app-error-message">
           {state.error}
         </div>
       )}
 
+      <input type="hidden" name="projectId" value={project.projectId} />
+
       <div>
-        <label className="app-form-label">タスク名</label>
+        <label className="app-form-label">プロジェクト名</label>
         <input
-          name="taskName"
+          name="projectName"
+          defaultValue={project.projectName}
           className="app-form-input"
-          placeholder="タスク名を入力"
+          placeholder="プロジェクト名を入力"
         />
       </div>
-
-      {selectedProject ? (
-        <div>
-          <label className="app-form-label">プロジェクト</label>
-          <p className="rounded border bg-gray-50 px-3 py-2 text-sm">
-            {selectedProject.projectName}
-          </p>
-          <input
-            type="hidden"
-            name="projectId"
-            value={selectedProject.projectId}
-          />
-        </div>
-      ) : (
-        <div>
-          <label className="app-form-label">プロジェクト</label>
-          <select
-            name="projectId"
-            defaultValue=""
-            className="app-form-input"
-          >
-            <option value="">プロジェクトを選択してください</option>
-            {projects.map((project) => (
-              <option key={project.projectId} value={project.projectId}>
-                {project.projectName}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
 
       <div>
         <label className="app-form-label">優先度</label>
         <select
           name="priorityId"
-          defaultValue=""
+          defaultValue={project.priorityId}
           className="app-form-input"
         >
-          <option value="">優先度を選択してください</option>
           {priorities.map((priority) => (
             <option key={priority.priorityId} value={priority.priorityId}>
               {priority.priorityName}
@@ -114,10 +98,9 @@ export default function TaskCreateForm({
         <label className="app-form-label">ステータス</label>
         <select
           name="statusId"
-          defaultValue=""
+          defaultValue={project.statusId}
           className="app-form-input"
         >
-          <option value="">ステータスを選択してください</option>
           {statuses.map((status) => (
             <option key={status.statusId} value={status.statusId}>
               {status.statusName}
@@ -131,6 +114,7 @@ export default function TaskCreateForm({
         <input
           type="date"
           name="startDate"
+          defaultValue={formatDateForInput(project.startDate)}
           className="app-form-input"
         />
       </div>
@@ -140,6 +124,7 @@ export default function TaskCreateForm({
         <input
           type="date"
           name="deadline"
+          defaultValue={formatDateForInput(project.deadline)}
           className="app-form-input"
         />
       </div>
@@ -148,6 +133,7 @@ export default function TaskCreateForm({
         <label className="app-form-label">説明</label>
         <textarea
           name="description"
+          defaultValue={project.description ?? ''}
           className="app-form-input min-h-32"
           placeholder="説明を入力"
         />
@@ -159,11 +145,14 @@ export default function TaskCreateForm({
           disabled={isPending}
           className="app-btn-primary"
         >
-          {isPending ? '作成中...' : '作成'}
+          {isPending ? '更新中...' : '更新'}
         </button>
 
-        <Link href={redirectTo || '/tasks'} className="app-btn-secondary">
-          キャンセル
+        <Link
+          href={`/projects/${project.projectId}`}
+          className="app-btn-secondary"
+        >
+          詳細へ戻る
         </Link>
       </div>
     </form>

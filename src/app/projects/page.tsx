@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma";
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 import AppNav from "@/components/AppNav";
 
 export const dynamic = 'force-dynamic';
@@ -14,21 +14,9 @@ type Props = {
   }>;
 };
 
-function formatDate(date: Date | null) {
-  if (!date) return '未設定';
+export default async function projectsPage({ searchParams }: Props) {
 
-  return date.toLocaleDateString('ja-JP');
-}
-
-export default async function taskPage({ searchParams }: Props) {
-
-  const { projectId, statusId, priorityId, assigneeId, keyword } = await searchParams;
-
-  const projects = await prisma.project.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  const { statusId, priorityId, assigneeId, keyword }= await searchParams;
 
   const statuses = await prisma.status.findMany({
     orderBy: {
@@ -50,14 +38,13 @@ export default async function taskPage({ searchParams }: Props) {
 
   const where = {
     AND: [
-      projectId ? { projectId } : {},
       statusId ? { statusId } : {},
       priorityId ? { priorityId } : {},
       assigneeId ? { assigneeId } : {},
       keyword ? {
         OR: [
           {
-            taskName: {
+            projectName: {
               contains: keyword,
               mode: 'insensitive' as const,
             },
@@ -69,29 +56,32 @@ export default async function taskPage({ searchParams }: Props) {
             },
           },
         ],
-      }
-      : {},
+      } : {},
     ],
   };
 
-
-  const tasks = await prisma.task.findMany({
+  const projects = await prisma.project.findMany({
     where,
     include: {
-      project: true,
       assignee: true,
       creator: true,
       priority: true,
       status: true,
+      tasks: {
+        select: {
+          taskId: true,
+          status: {
+            select: {
+              isCompleted: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
-    }
+    },
   });
-
-  const selectedProject = projects.find(
-    (project) => project.projectId === projectId
-  );
 
   const selectedStatus = statuses.find(
     (status) => status.statusId === statusId
@@ -105,7 +95,7 @@ export default async function taskPage({ searchParams }: Props) {
     (user) => user.userId === assigneeId
   );
 
-  const hasFilter = !!keyword || !!projectId || !!statusId || !!priorityId || !!assigneeId;
+  const hasFilter = !!keyword || !!statusId || !!priorityId || !!assigneeId;
 
   return (
     <main className="app-page">
@@ -114,33 +104,28 @@ export default async function taskPage({ searchParams }: Props) {
 
       <div className="app-page-header">
         <div>
-          <h1 className="app-page-title">タスク一覧</h1>
+          <h1 className="app-page-title">プロジェクト一覧</h1>
           <p className="app-page-description">
-            登録済みタスクの確認・検索・絞り込みができます。
+            登録済みプロジェクトの確認・検索・絞り込みができます。
           </p>
         </div>
 
-        <Link href="/tasks/new" className="app-btn-primary">
+        <Link href="/projects/new" className="app-btn-primary">
           新規作成
         </Link>
       </div>
 
-      <form method="get" key={`${keyword ?? ''}-${projectId ?? ''}-${statusId ?? ''}-${priorityId ?? ''}-${assigneeId ?? ''}`} className="app-filter-form">
+      <form method="get" key={`${keyword ?? ''}-${statusId ?? ''}-${priorityId ?? ''}-${assigneeId ?? ''}`} className="app-filter-form">
         <div className="app-filter-grid">
           <div>
-            <label className="app-form-label">Project</label>
-            <select
-              name="projectId"
-              defaultValue={projectId ?? ''}
+            <label className="app-form-label">キーワード</label>
+            <input
+              type="text"
+              name="keyword"
+              defaultValue={keyword ?? ''}
               className="app-form-input"
-            >
-              <option value="">すべて</option>
-              {projects.map((project) => (
-                <option key={project.projectId} value={project.projectId}>
-                  {project.projectName}
-                </option>
-              ))}
-            </select>
+              placeholder="Project名・説明で検索"
+            />
           </div>
 
           <div>
@@ -192,17 +177,6 @@ export default async function taskPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <div>
-          <label className="app-form-label">キーワード</label>
-          <input
-            type="text"
-            name="keyword"
-            defaultValue={keyword ?? ''}
-            className="app-form-input"
-            placeholder="タスク名・説明で検索"
-          />
-        </div>
-
         <div className="mt-4 flex gap-2">
           <button
             type="submit"
@@ -211,10 +185,7 @@ export default async function taskPage({ searchParams }: Props) {
             絞り込み
           </button>
 
-          <Link
-            href="/tasks"
-            className="app-btn-secondary"
-          >
+          <Link href="/projects" className="app-btn-secondary">
             条件リセット
           </Link>
         </div>
@@ -228,12 +199,6 @@ export default async function taskPage({ searchParams }: Props) {
             {keyword && (
               <span className="app-condition-tag">
                 キーワード：{keyword}
-              </span>
-            )}
-
-            {selectedProject && (
-              <span className="app-condition-tag">
-                Project：{selectedProject.projectName}
               </span>
             )}
 
@@ -258,47 +223,56 @@ export default async function taskPage({ searchParams }: Props) {
         </div>
       )}
 
-      {tasks.length === 0 ? (
+      {projects.length === 0 ? (
         <p className="app-empty-message">
           {
             hasFilter
-            ? '条件に一致するタスクがありません。検索条件を変更してください'
-            : 'タスクがありません。新規タスクから登録してください。'
+            ? '条件に一致するプロジェクトがありません。検索条件を変更してください。'
+            : 'プロジェクトがありません。新規作成からプロジェクトを追加してください。'
           }
         </p>
       ) : (
         <div className="space-y-4">
-          {tasks.map((task) => (
-            <div key={task.taskId} className="app-card">
-              <div className="mb-2 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">{task.taskId}</p>
+          {projects.map((project) => {
+            const totalTaskCount = project.tasks.length;
+
+            const completedTaskCount = project.tasks.filter(
+              (task) => task.status.isCompleted
+            ).length;
+
+            const progressRate =
+              totalTaskCount === 0
+                ? 0
+                : Math.round((completedTaskCount / totalTaskCount) * 100);
+
+            return (
+              <div key={project.projectId} className="app-card">
+                <div className="mb-2 flex items-center justify-between">
                   <Link
-                    href={`/tasks/${task.taskId}`}
+                    href={`/projects/${project.projectId}`}
                     className="text-lg font-bold underline"
                   >
-                    {task.taskName}
+                    {project.projectName}
                   </Link>
+
+                  <span className="text-sm text-gray-500">
+                    {project.projectId}
+                  </span>
                 </div>
 
-                <div className="text-right text-sm">
-                  <p>{task.status.statusName}</p>
-                  <p className="text-xs text-gray-500">
-                    {task.priority.priorityName}
+                <div className="space-y-1 text-sm">
+                  <p>担当者：{project.assignee.userName}</p>
+                  <p>作成者：{project.creator.userName}</p>
+                  <p>優先度：{project.priority.priorityName}</p>
+                  <p>ステータス：{project.status.statusName}</p>
+                  <p>
+                    タスク：{completedTaskCount} / {totalTaskCount} 完了
                   </p>
+                  <p>進捗率：{progressRate}%</p>
                 </div>
               </div>
-
-              <div className="grid gap-2 text-sm text-gray-700 sm:grid-cols-3">
-                <p>Project：{task.project.projectName}</p>
-                <p>担当者：{task.assignee.userName}</p>
-                <p>作成者：{task.creator.userName}</p>
-                <p>開始日：{formatDate(task.startDate)}</p>
-                <p>期限日：{formatDate(task.deadline)}</p>
-                <p>完了日：{formatDate(task.completedAt)}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>

@@ -1,9 +1,20 @@
+import Link from "next/link";
 import TaskCreateForm from "./taskCreateForm";
 import { prisma } from "@/lib/prisma";
+import AppNav from "@/components/AppNav";
+
+type Props = {
+  searchParams: Promise<{
+    projectId?: string;
+    redirectTo?: string;
+  }>;
+};
 
 export const dynamic = 'force-dynamic';
 
-export default async function newTaskPage() {
+export default async function newTaskPage({ searchParams }: Props) {
+
+  const { projectId, redirectTo } = await searchParams;
 
   const priorities = await prisma.priority.findMany({
     orderBy: { sortOrder: 'asc' },
@@ -13,11 +24,38 @@ export default async function newTaskPage() {
     orderBy: { sortOrder: 'asc' },
   });
 
-  return (
-    <main className="mx-auto max-w-2xl p-8">
-      <h1 className="mb-6 text-2xl font-bold">タスク作成</h1>
+  const projects = await prisma.project.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
 
-      <TaskCreateForm priorities={priorities} statuses={statuses} />
+  const selectedProject = projectId ? await prisma.project.findUnique({
+    where: {
+      projectId,
+    },
+  }) : null;
+
+  return (
+    <main className="app-page">
+      <AppNav />
+
+      <div className="app-page-header">
+        <div>
+          <h1 className="app-page-title">タスク作成</h1>
+          <p className="app-page-description">
+            新しいタスクを登録します。
+          </p>
+        </div>
+
+        <Link href="/tasks" className="app-btn-secondary">
+          一覧へ戻る
+        </Link>
+      </div>
+
+      <section className="app-card">
+        <TaskCreateForm priorities={priorities} statuses={statuses} projects={projects} selectedProject={selectedProject} redirectTo={redirectTo} />
+      </section>
     </main>
   );
 }
