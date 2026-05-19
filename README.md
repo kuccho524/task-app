@@ -76,6 +76,17 @@ Task Appは、Project単位でTaskを管理できるタスク管理アプリで�
 - `/projects/[projectId]`：Project詳細
 - `/projects/[projectId]/edit`：Project編集
 
+## テスト
+
+Vitestを使用して、以下の主要ロジックに対する単体テストを実装しています。
+
+- Project進捗率計算
+- Task完了件数の集計
+- 編集・削除権限判定
+- Project削除可否判定
+- 日付フォーマット
+- 開始日・期限日のバリデーション
+
 ## 工夫した点
 
 - Supabase Authとpublic.usersを連携し、認証情報とアプリ用ユーザー情報を分離
