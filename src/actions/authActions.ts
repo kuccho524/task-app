@@ -85,7 +85,7 @@ export async function login(
     return { error: 'メールアドレスまたはパスワードが正しくありません', };
   }
 
-  redirect('/tasks');
+  redirect('/projects');
 }
 
 export async function logout() {
