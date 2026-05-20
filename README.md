@@ -23,7 +23,7 @@ Task Appは、Project単位でTaskを管理できるタスク管理アプリで�
 
 ### テストアカウント
 
-・メールアドレス：test@example.com
+・メールアドレス：test@example.com</ br>
 ・パスワード：password
 
 ## 主な機能
