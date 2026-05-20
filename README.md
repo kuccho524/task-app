@@ -2,18 +2,19 @@
 
 ## 概要
 
-Task Appは、Project単位でTaskを管理できるタスク管理アプリです。  
-ユーザー認証、Project / Task CRUD、検索・絞り込み、進捗表示に対応しています。
+Task App は、Project単位でTaskを管理できる小規模タスク管理アプリです。
 
-## 使用技術
+個人・小規模チームでのタスク管理を想定し、Project / Task のCRUD、検索・絞り込み、進捗率表示、作成者ベースの編集・削除制御に対応しています。
 
-- Next.js
-- TypeScript
-- Prisma
-- Supabase PostgreSQL
-- Supabase Auth
-- Tailwind CSS
-- Vercel
+単なるToDo管理ではなく、実務で必要になりやすい以下の観点を意識して実装しました。
+
+- ProjectとTaskの親子関係管理
+- ステータス・優先度・担当者による絞り込み
+- Project単位の進捗率表示
+- 関連Taskが存在するProjectの削除制御
+- 作成者のみ編集・削除できる権限制御
+- Supabase Authとアプリ用ユーザー情報の分離
+- Vitestによる主要ロジックの単体テスト
 
 ## デモ
 
@@ -23,7 +24,7 @@ Task Appは、Project単位でTaskを管理できるタスク管理アプリで�
 
 ### テストアカウント
 
-```txt
+```text
 メールアドレス：test@example.com
 パスワード：password
 ```
