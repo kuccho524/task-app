@@ -76,17 +76,6 @@ Task Appは、Project単位でTaskを管理できるタスク管理アプリで�
 - `/projects/[projectId]`：Project詳細
 - `/projects/[projectId]/edit`：Project編集
 
-## テスト
-
-Vitestを使用して、以下の主要ロジックに対する単体テストを実装しています。
-
-- Project進捗率計算
-- Task完了件数の集計
-- 編集・削除権限判定
-- Project削除可否判定
-- 日付フォーマット
-- 開始日・期限日のバリデーション
-
 ## 工夫した点
 
 - Supabase Authとpublic.usersを連携し、認証情報とアプリ用ユーザー情報を分離
@@ -98,6 +87,47 @@ Vitestを使用して、以下の主要ロジックに対する単体テスト�
 - Project削除時、関連Taskが存在する場合は削除不可にして安全性を確保
 - 作成者のみ編集・削除できるように権限制御
 - 共通CSSにより一覧・詳細・フォーム画面の見た目を統一
+
+## テスト
+
+Vitestを使用して、以下の主要ロジックに対する単体テストを実装しています。
+
+- Project進捗率計算
+- Task完了件数の集計
+- 編集・削除権限判定
+- Project削除可否判定
+- 日付フォーマット
+- 開始日・期限日のバリデーション
+
+## セットアップ
+
+### 1. リポジトリをクローン
+git clone <repository-url>
+cd task-app
+
+### 2. パッケージをインストール
+npm install
+
+### 3. 環境変数を設定
+.env.example を参考に .env または .env.local を作成します。
+
+DATABASE_URL=""
+DIRECT_URL=""
+NEXT_PUBLIC_SUPABASE_URL=""
+NEXT_PUBLIC_SUPABASE_ANON_KEY=""
+SUPABASE_SERVICE_ROLE_KEY=""
+
+### 4. Prisma Clientを生成
+npx prisma generate
+
+### 5. 開発サーバー起動
+npm run dev
+
+### 6. テスト
+npm run test:run
+
+### 7. ビルド
+npm run build
 
 ## 今後の改善予定
 

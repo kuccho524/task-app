@@ -35,7 +35,7 @@ export default function LoginForm() {
       </button>
 
       <div className="text-sm">
-        すでにアカウントをお持ちでない方は{' '}
+        アカウントをお持ちでない方は{' '}
         <Link href="/signup" className="text-blue-600 underline">ユーザー登録</Link>
       </div>
     </form>
