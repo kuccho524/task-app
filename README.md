@@ -116,7 +116,7 @@ Vitestを使用して、以下の主要ロジックに対する単体テスト�
 ## セットアップ
 
 ### 1. リポジトリをクローン
-git clone https://github.com/kuccho524/task-app.git
+git clone https://github.com/kuccho524/task-app.git  
 cd task-app
 
 ### 2. パッケージをインストール
