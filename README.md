@@ -15,6 +15,17 @@ Task Appは、Project単位でTaskを管理できるタスク管理アプリで�
 - Tailwind CSS
 - Vercel
 
+## デモ
+
+以下のURLから動作確認できます。
+
+- 本番環境：https://task-app-two-vert.vercel.app/
+
+### テストアカウント
+
+メールアドレス：test@example.com
+パスワード：password
+
 ## 主な機能
 
 ### 認証
